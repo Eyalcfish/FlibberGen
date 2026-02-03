@@ -37,6 +37,15 @@ class GraphNode(Node):
         self.refresh_btn.clicked.connect(self.refresh_graph)
         layout.addWidget(self.refresh_btn)
         
+        # Visualizer Button
+        self.viz_btn = QPushButton("⛶ Open Slicer Visualizer")
+        self.viz_btn.setStyleSheet("""
+            QPushButton { background: #3C3C3C; color: #CCCCCC; border: 1px solid #555; padding: 4px; font-size: 10px; }
+            QPushButton:hover { background: #4C4C4C; }
+        """)
+        self.viz_btn.clicked.connect(self.open_visualizer)
+        layout.addWidget(self.viz_btn)
+        
         # Matplotlib canvas
         self.figure = Figure(figsize=(3, 2.5), dpi=80, facecolor='#1E1E1E')
         self.canvas = FigureCanvas(self.figure)
@@ -50,7 +59,7 @@ class GraphNode(Node):
         
         self.proxy.setWidget(self.widget)
         self.proxy.setPos(10, 30)
-        self.proxy.resize(300, 280)
+        self.proxy.resize(300, 300) # Increased height for button
         
         # Initial empty plot
         self.setup_axes()
@@ -66,6 +75,20 @@ class GraphNode(Node):
         self.ax.spines['right'].set_color('#555')
         self.ax.set_xlabel('X', color='#888', fontsize=9)
         self.ax.set_ylabel('Y', color='#888', fontsize=9)
+        
+    def open_visualizer(self):
+        from ui.graph_visualizer import GraphSlicerDialog
+        
+        model = self.get_input_value(0)
+        data = self.get_input_value(1)
+        
+        if model is None:
+            self.status_lbl.setText("Need Model for visualizer!")
+            self.status_lbl.setStyleSheet("color: #F44747; font-size: 9px;")
+            return
+            
+        dlg = GraphSlicerDialog(model, data)
+        dlg.exec() # Modal execution
         
     def refresh_graph(self):
         """Pull model and data, render graph"""
@@ -111,7 +134,7 @@ class GraphNode(Node):
             if n_features == 1:
                 X_line = x_line.reshape(-1, 1)
             else:
-                # For multi-feature, plot slice with other features at 0
+                # For multi-feature node view, default to 0 for others
                 X_line = np.zeros((100, n_features))
                 X_line[:, 0] = x_line
             
