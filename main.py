@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QDockWidget
+from PySide6.QtWidgets import QApplication, QMainWindow, QDockWidget, QFileDialog
 from PySide6.QtCore import Qt
 
 from node_engine.scene import NodeScene
@@ -50,12 +50,40 @@ class MainWindow(QMainWindow):
 
     def createMenu(self):
         menubar = self.menuBar()
+        
+        # File Menu
+        file_menu = menubar.addMenu("File")
+        file_menu.addAction("Save Profile...", self.save_profile)
+        file_menu.addAction("Load Profile...", self.load_profile)
+        
         view_menu = menubar.addMenu("View")
         
         # Add actions to toggle docks
         view_menu.addAction(self.dock_data.toggleViewAction())
         view_menu.addAction(self.dock_code.toggleViewAction())
         view_menu.addAction(self.dock_metrics.toggleViewAction())
+
+    def save_profile(self):
+        filename, _ = QFileDialog.getSaveFileName(self, "Save Profile", "", "JSON (*.json)")
+        if filename:
+            import json
+            data = self.scene.serialize()
+            try:
+                with open(filename, 'w') as f:
+                    json.dump(data, f, indent=4)
+            except Exception as e:
+                print(f"Error saving: {e}")
+
+    def load_profile(self):
+        filename, _ = QFileDialog.getOpenFileName(self, "Load Profile", "", "JSON (*.json)")
+        if filename:
+            import json
+            try:
+                with open(filename, 'r') as f:
+                    data = json.load(f)
+                self.scene.deserialize(data, self.view.create_node)
+            except Exception as e:
+                print(f"Error loading: {e}")
 
     def createToolbar(self):
         toolbar = self.addToolBar("Nodes")

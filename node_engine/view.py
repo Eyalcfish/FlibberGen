@@ -234,14 +234,7 @@ class NodeView(QGraphicsView):
             else:
                 self.add_node_by_name(action.text(), event.pos())
 
-    def add_node_by_name(self, name, pos_point):
-        scene_pos = self.mapToScene(pos_point)
-        node = self._create_node(name)
-        if node:
-            self.scene().addItem(node)
-            node.setPos(scene_pos)
-    
-    def _create_node(self, name):
+    def create_node(self, name):
         node_map = {
             "CSV Loader": csv_loader_node.CSVLoaderNode,
             "Column Selector": column_selector_node.ColumnSelectorNode,
@@ -257,12 +250,19 @@ class NodeView(QGraphicsView):
         }
         cls = node_map.get(name)
         return cls() if cls else None
+
+    def add_node_by_name(self, name, pos_point):
+        scene_pos = self.mapToScene(pos_point)
+        node = self.create_node(name)
+        if node:
+            self.scene().addItem(node)
+            node.setPos(scene_pos)
             
     def add_node(self, node_type_str):
         # Helper for external toolbars
         center_pt = self.viewport().rect().center()
         scene_pos = self.mapToScene(center_pt)
-        node = self._create_node(node_type_str)
+        node = self.create_node(node_type_str)
         if node:
             self.scene().addItem(node)
             node.setPos(scene_pos)

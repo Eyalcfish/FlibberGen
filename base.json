@@ -1,0 +1,109 @@
+{
+    "nodes": [
+        {
+            "title": "Graph View",
+            "x": 443.0,
+            "y": -295.0,
+            "id": 0
+        },
+        {
+            "title": "Graph View",
+            "x": 433.0,
+            "y": 92.0,
+            "id": 1
+        },
+        {
+            "title": "Live Tester",
+            "x": 178.0,
+            "y": -289.0,
+            "id": 2
+        },
+        {
+            "title": "Live Tester",
+            "x": 138.0,
+            "y": 63.0,
+            "id": 3
+        },
+        {
+            "title": "Neural Network",
+            "x": -97.0,
+            "y": -78.0,
+            "id": 4
+        },
+        {
+            "title": "PolyFit",
+            "x": -78.0,
+            "y": -289.0,
+            "id": 5
+        },
+        {
+            "title": "Column Selector",
+            "x": -360.0,
+            "y": -185.0,
+            "id": 6
+        },
+        {
+            "title": "CSV Loader",
+            "x": -372.0,
+            "y": -316.0,
+            "filepath": "/home/eyalc/Projects/MagazineCounter/test.csv",
+            "id": 7
+        }
+    ],
+    "edges": [
+        {
+            "start_node_id": 6,
+            "end_node_id": 1,
+            "start_socket_index": 0,
+            "end_socket_index": 1
+        },
+        {
+            "start_node_id": 6,
+            "end_node_id": 0,
+            "start_socket_index": 0,
+            "end_socket_index": 1
+        },
+        {
+            "start_node_id": 4,
+            "end_node_id": 1,
+            "start_socket_index": 0,
+            "end_socket_index": 0
+        },
+        {
+            "start_node_id": 5,
+            "end_node_id": 0,
+            "start_socket_index": 0,
+            "end_socket_index": 0
+        },
+        {
+            "start_node_id": 4,
+            "end_node_id": 3,
+            "start_socket_index": 0,
+            "end_socket_index": 0
+        },
+        {
+            "start_node_id": 5,
+            "end_node_id": 2,
+            "start_socket_index": 0,
+            "end_socket_index": 0
+        },
+        {
+            "start_node_id": 6,
+            "end_node_id": 4,
+            "start_socket_index": 0,
+            "end_socket_index": 0
+        },
+        {
+            "start_node_id": 6,
+            "end_node_id": 5,
+            "start_socket_index": 0,
+            "end_socket_index": 0
+        },
+        {
+            "start_node_id": 7,
+            "end_node_id": 6,
+            "start_socket_index": 0,
+            "end_socket_index": 0
+        }
+    ]
+}

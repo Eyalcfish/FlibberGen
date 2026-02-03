@@ -106,3 +106,13 @@ class Node(QGraphicsItem):
         # Get that socket's node
         other_node = other_socket.node
         return other_node.eval()
+        
+    def to_dict(self):
+        return {
+            "title": self.title,
+            "x": self.pos().x(),
+            "y": self.pos().y()
+        }
+        
+    def from_dict(self, data):
+        self.setPos(data.get("x", 0), data.get("y", 0))

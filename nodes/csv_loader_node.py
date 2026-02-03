@@ -49,17 +49,32 @@ class CSVLoaderNode(Node):
     def browse(self):
         path, _ = QFileDialog.getOpenFileName(None, "Open CSV", "", "CSV (*.csv)")
         if path:
-            try:
-                self.df = pd.read_csv(path)
-                filename = path.split('/')[-1].split('\\')[-1]
-                self.lbl.setText(f"✓ {filename}")
-                self.lbl.setStyleSheet("color: #4EC9B0; font-size: 10px;")
-                # Also update global manager
-                DataManager.get().set_dataframe(self.df)
-                Signals.get().data_loaded.emit(self.df)
-            except Exception as e:
-                self.lbl.setText(f"Error: {e}")
-                self.lbl.setStyleSheet("color: #F44747; font-size: 10px;")
+            self.load_file(path)
+
+    def load_file(self, path):
+        try:
+            self.df = pd.read_csv(path)
+            self.filepath = path
+            filename = path.split('/')[-1].split('\\')[-1]
+            self.lbl.setText(f"✓ {filename}")
+            self.lbl.setStyleSheet("color: #4EC9B0; font-size: 10px;")
+            # Also update global manager
+            DataManager.get().set_dataframe(self.df)
+            Signals.get().data_loaded.emit(self.df)
+        except Exception as e:
+            self.lbl.setText(f"Error: {e}")
+            self.lbl.setStyleSheet("color: #F44747; font-size: 10px;")
         
     def eval(self):
         return self.df
+        
+    def to_dict(self):
+        data = super().to_dict()
+        data["filepath"] = getattr(self, "filepath", "")
+        return data
+        
+    def from_dict(self, data):
+        super().from_dict(data)
+        path = data.get("filepath", "")
+        if path:
+            self.load_file(path)
