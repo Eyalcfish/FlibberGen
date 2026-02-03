@@ -76,6 +76,7 @@ class ColumnSelectorNode(Node):
         self.proxy.setWidget(self.widget)
         self.proxy.setPos(10, 30)
         self.proxy.resize(180, 240)
+        self.proxy.setZValue(1.0)  # Ensure widget is above node body
 
     def refresh_columns(self):
         df = self.get_input_value(0)

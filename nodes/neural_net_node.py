@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import (QGraphicsProxyWidget, QWidget, QVBoxLayout, QHBoxLayout,
-                               QLabel, QSpinBox, QPushButton, QComboBox, QLineEdit)
+                               QLabel, QSpinBox, QPushButton, QLineEdit)
+from ui.graphics_combo import GraphicsComboBox
 from PySide6.QtCore import Qt
 from node_engine.node_base import Node
 from sklearn.neural_network import MLPRegressor
@@ -62,18 +63,16 @@ class NeuralNetNode(Node):
         # Activation
         row1 = QHBoxLayout()
         row1.addWidget(QLabel("Activ:", styleSheet="font-size: 10px;"))
-        self.activation_combo = QComboBox()
+        self.activation_combo = GraphicsComboBox()
         self.activation_combo.addItems(["relu", "tanh", "logistic", "identity"])
-        self.activation_combo.setStyleSheet("background: #3c3c3c; color: white;")
         row1.addWidget(self.activation_combo)
         layout.addLayout(row1)
         
         # Solver
         row2 = QHBoxLayout()
         row2.addWidget(QLabel("Solver:", styleSheet="font-size: 10px;"))
-        self.solver_combo = QComboBox()
+        self.solver_combo = GraphicsComboBox()
         self.solver_combo.addItems(["adam", "lbfgs", "sgd"])
-        self.solver_combo.setStyleSheet("background: #3c3c3c; color: white;")
         row2.addWidget(self.solver_combo)
         layout.addLayout(row2)
         
@@ -105,6 +104,7 @@ class NeuralNetNode(Node):
         self.proxy.setWidget(self.widget)
         self.proxy.setPos(10, 30)
         self.proxy.resize(180, 200)
+        self.proxy.setZValue(1.0)  # Ensure widget is above node body for clicks
 
     def run_train(self):
         self.eval()

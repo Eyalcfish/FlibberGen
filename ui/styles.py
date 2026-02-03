@@ -58,6 +58,22 @@ class VSCodeStyle:
             padding: 3px;
         }}
         
+        QComboBox::drop-down {{
+            subcontrol-origin: padding;
+            subcontrol-position: top right;
+            width: 15px;
+            border-left-width: 0px;
+            border-top-right-radius: 3px;
+            border-bottom-right-radius: 3px;
+        }}
+        
+        QComboBox QAbstractItemView {{
+            border: 1px solid {VSCodeStyle.BORDER};
+            background-color: {VSCodeStyle.BG_INPUT};
+            color: {VSCodeStyle.TEXT_MAIN};
+            selection-background-color: {VSCodeStyle.ACCENT};
+        }}
+        
         /* Buttons */
         QPushButton {{
             background-color: {VSCodeStyle.BG_INPUT};

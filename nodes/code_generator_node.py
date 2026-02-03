@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import (QGraphicsProxyWidget, QWidget, QVBoxLayout, QHBoxLayout,
-                               QLabel, QComboBox, QCheckBox, QPushButton, QTextEdit)
+                               QLabel, QCheckBox, QPushButton, QTextEdit)
+from ui.graphics_combo import GraphicsComboBox
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QClipboard, QGuiApplication
 from node_engine.node_base import Node
@@ -28,9 +29,8 @@ class CodeGeneratorNode(Node):
         
         # Options row
         row = QHBoxLayout()
-        self.lang_combo = QComboBox()
+        self.lang_combo = GraphicsComboBox()
         self.lang_combo.addItems(["Python", "C", "Java"])
-        self.lang_combo.setStyleSheet("background: #3c3c3c; color: white;")
         self.lang_combo.currentIndexChanged.connect(self.generate)
         row.addWidget(self.lang_combo)
         
@@ -66,6 +66,7 @@ class CodeGeneratorNode(Node):
         self.proxy.setWidget(self.widget)
         self.proxy.setPos(10, 30)
         self.proxy.resize(260, 210)
+        self.proxy.setZValue(1.0)  # Ensure widget is above node body for clicks
 
     def generate(self):
         models = []

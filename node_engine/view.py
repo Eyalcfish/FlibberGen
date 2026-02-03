@@ -17,7 +17,9 @@ class NodeView(QGraphicsView):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
-        self.setDragMode(QGraphicsView.RubberBandDrag)
+        
+        # Default to NoDrag to allow widget interaction
+        self.setDragMode(QGraphicsView.NoDrag)
         
         # Interaction state
         self.mode = "NO_OP"
@@ -61,53 +63,74 @@ class NodeView(QGraphicsView):
     def middleMouseButtonRelease(self, event):
         fake_event = QMouseEvent(event.type(), event.position(), Qt.LeftButton, Qt.LeftButton, event.modifiers())
         super().mouseReleaseEvent(fake_event)
-        self.setDragMode(QGraphicsView.RubberBandDrag)
+        self.setDragMode(QGraphicsView.NoDrag)
         
     def leftMouseButtonPress(self, event):
         item = self.itemAt(event.pos())
         
-        # Socket clicking -> Create Edge
+        # 1. Socket Click -> Create Edge
         if isinstance(item, Socket):
             self.mode = "EDGE_DRAG"
             self.drag_start_socket = item
             self.drag_point = DummySocket(item.get_scene_pos())
-            # Don't add DummySocket to scene - it's just a position holder
             self.drag_edge = Edge(self.scene(), item, self.drag_point)
+            # Ensure NoDrag so we don't select/pan while wiring
+            self.setDragMode(QGraphicsView.NoDrag)
             return
+            
+        # 2. Background Click -> Enable RubberBand
+        if item is None:
+            self.setDragMode(QGraphicsView.RubberBandDrag)
+        else:
+            # 3. Item Click (Node, Widget, etc)
+            self.setDragMode(QGraphicsView.NoDrag)
+            
+            # Special handling for Proxy Widgets (interactive controls)
+            # Walk up to find if we clicked a proxy
+            temp = item
+            while temp:
+                from PySide6.QtWidgets import QGraphicsProxyWidget
+                if isinstance(temp, QGraphicsProxyWidget):
+                    # Force focus to the proxy widget to ensure it receives input
+                    temp.setFocus()
+                    break
+                temp = temp.parentItem()
             
         super().mousePressEvent(event)
         
     def leftMouseButtonRelease(self, event):
+        # Always reset to NoDrag after release to be safe
+        # But process Edge Drag logic first
+        
         if self.mode == "EDGE_DRAG":
             self.mode = "NO_OP"
             
-            # Clean up drag helpers
             if self.drag_edge:
                 self.drag_edge.remove()
                 self.drag_edge = None
-            self.drag_point = None  # No scene removal needed
+            self.drag_point = None
 
             item = self.itemAt(event.pos())
             
-            # Check if dropped on a socket
             if isinstance(item, Socket) and item is not self.drag_start_socket:
-                # Logic: Input must connect to Output
                 if item.is_input != self.drag_start_socket.is_input:
                     # Determine start/end order
                     start = self.drag_start_socket if not self.drag_start_socket.is_input else item
                     end = item if not self.drag_start_socket.is_input else self.drag_start_socket
                     
-                    # One input can only have one edge
                     if end.is_input and end.has_edge():
                         end.remove_all_edges()
                         
                     Edge(self.scene(), start, end)
-                    return
-
-            super().mouseReleaseEvent(event)
-            return
             
+            # Reset and return
+            self.setDragMode(QGraphicsView.NoDrag)
+            return
+
         super().mouseReleaseEvent(event)
+        
+        # Reset to NoDrag for next interaction
+        self.setDragMode(QGraphicsView.NoDrag)
         
     def mouseMoveEvent(self, event):
         if self.mode == "EDGE_DRAG" and self.drag_edge and self.drag_point:

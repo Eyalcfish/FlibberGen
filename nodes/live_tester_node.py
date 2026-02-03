@@ -61,6 +61,7 @@ class LiveTesterNode(Node):
         self.proxy.setWidget(self.widget)
         self.proxy.setPos(10, 30)
         self.proxy.resize(200, 200)
+        self.proxy.setZValue(1.0)  # Ensure interactive
 
     def load_features(self):
         """Load feature info from connected model - shows ALL original inputs"""

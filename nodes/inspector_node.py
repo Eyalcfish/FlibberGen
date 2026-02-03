@@ -49,6 +49,7 @@ class InspectorNode(Node):
         self.proxy.setWidget(self.widget)
         self.proxy.setPos(10, 30)
         self.proxy.resize(180, 140)
+        self.proxy.setZValue(1.0)  # Ensure interactive
 
     def refresh(self):
         """Button to trigger evaluation"""
