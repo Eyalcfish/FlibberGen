@@ -26,16 +26,23 @@ class NodeView(QGraphicsView):
         self.drag_start_socket = None
         self.drag_edge = None
         
+    def zoom_view(self, factor):
+        self.scale(factor, factor)
+
     def wheelEvent(self, event):
-        zoom_out_factor = 1 / 1.25
-        zoom_in_factor = 1.25
-        
-        if event.angleDelta().y() > 0:
-            zoom_factor = zoom_in_factor
-        else:
-            zoom_factor = zoom_out_factor
+        if event.modifiers() & Qt.ControlModifier:
+            zoom_out_factor = 1 / 1.25
+            zoom_in_factor = 1.25
             
-        self.scale(zoom_factor, zoom_factor)
+            if event.angleDelta().y() > 0:
+                zoom_factor = zoom_in_factor
+            else:
+                zoom_factor = zoom_out_factor
+                
+            self.zoom_view(zoom_factor)
+            event.accept()
+        else:
+            super().wheelEvent(event)
     
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
@@ -80,7 +87,7 @@ class NodeView(QGraphicsView):
             
         # 2. Background Click -> Enable RubberBand
         if item is None:
-            self.setDragMode(QGraphicsView.RubberBandDrag)
+            self.setDragMode(QGraphicsView.ScrollHandDrag)
         else:
             # 3. Item Click (Node, Widget, etc)
             self.setDragMode(QGraphicsView.NoDrag)
@@ -140,6 +147,17 @@ class NodeView(QGraphicsView):
         super().mouseMoveEvent(event)
 
     def keyPressEvent(self, event):
+        # Zoom shortcuts
+        if event.modifiers() & Qt.ControlModifier:
+            if event.key() == Qt.Key_Equal or event.key() == Qt.Key_Plus:
+                self.zoom_view(1.25)
+                event.accept()
+                return
+            elif event.key() == Qt.Key_Minus:
+                self.zoom_view(1 / 1.25)
+                event.accept()
+                return
+
         if event.key() == Qt.Key_Delete or event.key() == Qt.Key_Backspace:
             self.delete_selected()
         else:
