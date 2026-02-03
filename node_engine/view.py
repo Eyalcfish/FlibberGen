@@ -6,7 +6,7 @@ from .edge import Edge
 # Import all node types
 from nodes import csv_loader_node, column_selector_node, splitter_node, range_filter_node
 from nodes import polyfit_node, manual_coeff_node, code_generator_node, inspector_node, live_tester_node
-from nodes import graph_node
+from nodes import graph_node, neural_net_node
 
 class NodeView(QGraphicsView):
     def __init__(self, scene, parent=None):
@@ -172,6 +172,7 @@ class NodeView(QGraphicsView):
         # Math nodes
         math_menu = menu.addMenu("Add Math")
         math_menu.addAction("PolyFit")
+        math_menu.addAction("Neural Network")
         math_menu.addAction("Manual Coeffs")
         
         # Output nodes
@@ -206,6 +207,7 @@ class NodeView(QGraphicsView):
             "Conditional Splitter": splitter_node.ConditionalSplitterNode,
             "Range Filter": range_filter_node.RangeFilterNode,
             "PolyFit": polyfit_node.PolyFitNode,
+            "Neural Network": neural_net_node.NeuralNetNode,
             "Manual Coeffs": manual_coeff_node.ManualCoeffNode,
             "Code Generator": code_generator_node.CodeGeneratorNode,
             "Inspector": inspector_node.InspectorNode,

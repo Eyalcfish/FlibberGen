@@ -69,6 +69,7 @@ class MainWindow(QMainWindow):
         toolbar.addSeparator()
         # Math
         toolbar.addAction("PolyFit", lambda: self.view.add_node("PolyFit"))
+        toolbar.addAction("Neural Net", lambda: self.view.add_node("Neural Network"))
         toolbar.addAction("Manual", lambda: self.view.add_node("Manual Coeffs"))
         toolbar.addSeparator()
         # Output
