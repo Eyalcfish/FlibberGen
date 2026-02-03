@@ -53,12 +53,28 @@ class NeuralNetNode(Node):
         layout.setSpacing(3)
         
         # Hidden Layers configuration
-        layout.addWidget(QLabel("Hidden Layers:", styleSheet="font-size: 10px; color: #aaa;"))
-        self.layers_input = QLineEdit("100, 50")
-        self.layers_input.setPlaceholderText("e.g. 100, 50")
-        self.layers_input.setToolTip("Comma separated layer sizes")
-        self.layers_input.setStyleSheet("background: #3c3c3c; border: 1px solid #555; padding: 2px;")
-        layout.addWidget(self.layers_input)
+        self.layer_spinboxes = []
+        
+        # Num Layers Selector
+        row_n = QHBoxLayout()
+        row_n.addWidget(QLabel("Num Layers:", styleSheet="font-size: 10px; color: #aaa;"))
+        self.num_layers_spin = QSpinBox()
+        self.num_layers_spin.setRange(1, 5)
+        self.num_layers_spin.setValue(2) # Default
+        self.num_layers_spin.setStyleSheet("background: #3c3c3c; color: white;")
+        self.num_layers_spin.valueChanged.connect(self.update_layers_ui)
+        row_n.addWidget(self.num_layers_spin)
+        layout.addLayout(row_n)
+        
+        # Dynamic Container for Layer Sizes
+        self.layers_container = QWidget()
+        self.layers_layout = QVBoxLayout(self.layers_container)
+        self.layers_layout.setContentsMargins(0,0,0,0)
+        self.layers_layout.setSpacing(2)
+        layout.addWidget(self.layers_container)
+        
+        # Initial population
+        self.update_layers_ui()
         
         # Activation
         row1 = QHBoxLayout()
@@ -103,24 +119,54 @@ class NeuralNetNode(Node):
         
         self.proxy.setWidget(self.widget)
         self.proxy.setPos(10, 30)
-        self.proxy.resize(180, 200)
-        self.proxy.setZValue(1.0)  # Ensure widget is above node body for clicks
+        self.adjust_height()
+        self.proxy.setZValue(1.0) 
+
+    def update_layers_ui(self):
+        # Clear existing
+        self.layer_spinboxes = []
+        while self.layers_layout.count():
+            item = self.layers_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        
+        n = self.num_layers_spin.value()
+        for i in range(n):
+            row = QHBoxLayout()
+            row.setContentsMargins(0,0,0,0)
+            lbl = QLabel(f"L{i+1} Size:")
+            lbl.setStyleSheet("font-size: 9px; color: #888;")
+            row.addWidget(lbl)
+            
+            spin = QSpinBox()
+            spin.setRange(1, 2000)
+            spin.setValue(100 if i == 0 else 50) # Default taper
+            spin.setStyleSheet("background: #3c3c3c; color: white;")
+            row.addWidget(spin)
+            
+            self.layers_layout.addLayout(row)
+            self.layer_spinboxes.append(spin)
+            
+        self.adjust_height()
+        
+    def adjust_height(self):
+        # Base height + space per layer row
+        n = self.num_layers_spin.value()
+        new_height = 240 + (n * 25)
+        self.height = max(240, new_height)
+        self.proxy.resize(180, new_height - 30)
 
     def run_train(self):
         self.eval()
 
     def fit(self, X, Y, input_feature_names=None):
         try:
-            # Parse layers
-            layers_str = self.layers_input.text()
-            try:
-                if not layers_str.strip():
-                    layers = (100,)
-                else:
-                    layers = tuple(int(x.strip()) for x in layers_str.split(',') if x.strip())
-            except ValueError:
-                self.status_lbl.setText("Invalid layers format")
-                return None
+            # Parse layers from dynamic list
+            layers = []
+            for spin in self.layer_spinboxes:
+                layers.append(spin.value())
+            
+            layers = tuple(layers)
                 
             activation = self.activation_combo.currentText()
             solver = self.solver_combo.currentText()
